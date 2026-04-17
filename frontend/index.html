@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>MovieFlix</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #111;
+            color: #fff;
+            text-align: center;
+        }
+
+        h1 {
+            color: #e50914;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #e50914;
+            color: white;
+            cursor: pointer;
+        }
+
+        .movie {
+            background: #222;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>🎬 MovieFlix</h1>
+
+<h3>Cadastrar Filme</h3>
+<input id="title" placeholder="Nome do filme">
+<button onclick="addMovie()">Adicionar</button>
+
+<h3>Filmes</h3>
+<div id="movies"></div>
+
+<script>
+const API = "/api";
+
+async function loadMovies() {
+    const res = await fetch(API + "/movies");
+    const movies = await res.json();
+
+    const div = document.getElementById("movies");
+    div.innerHTML = "";
+
+    movies.forEach(m => {
+        const el = document.createElement("div");
+        el.className = "movie";
+
+        el.innerHTML = `
+            <h4>${m.title}</h4>
+            <input type="number" id="rate-${m.id}" placeholder="Nota 1-10">
+            <button onclick="rateMovie(${m.id})">Avaliar</button>
+            <button onclick="getAverage(${m.id})">Ver Média</button>
+            <p id="avg-${m.id}"></p>
+        `;
+
+        div.appendChild(el);
+    });
+}
+
+async function addMovie() {
+    const title = document.getElementById("title").value;
+
+    await fetch(API + "/movies", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ title })
+    });
+
+    loadMovies();
+}
+
+async function rateMovie(id) {
+    const rating = document.getElementById("rate-" + id).value;
+
+    await fetch(API + `/movies/${id}/rate`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ rating: Number(rating) })
+    });
+
+    alert("Avaliado!");
+}
+
+async function getAverage(id) {
+    const res = await fetch(API + `/movies/${id}/average`);
+    const data = await res.json();
+
+    document.getElementById("avg-" + id).innerText =
+        "Média: " + data.average.toFixed(2);
+}
+
+loadMovies();
+</script>
+
+</body>
+</html>
