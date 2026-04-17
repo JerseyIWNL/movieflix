@@ -18,7 +18,7 @@ jobs:
     - name: Test container
       run: |
         docker run -d -p 3000:3000 --name test movieflix-backend
-        sleep 10
+        sleep 5
         curl http://localhost:3000/movies
 
     - name: Login Docker Hub
