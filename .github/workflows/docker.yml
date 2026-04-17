@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Build Docker image
       run: docker build -t movieflix-backend ./backend
@@ -19,7 +19,7 @@ jobs:
       run: |
         docker run -d -p 3000:3000 --name test movieflix-backend
         sleep 5
-        curl http://localhost:3000/movies
+        curl -f http://localhost:3000/movies || exit 1
 
     - name: Login Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
